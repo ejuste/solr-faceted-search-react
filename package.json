@@ -26,6 +26,7 @@
     "prop-types": "^15.6.1",
     "react": ">= 16",
     "react-dom": ">= 16",
+    "react-html-parser": "^2.0.2",
     "xhr": "^2.2.0"
   },
   "devDependencies": {

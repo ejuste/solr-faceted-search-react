@@ -39,6 +39,7 @@ class SolrFacetedSearch extends React.Component {
 
     const preloadListItem = query.pageStrategy === "cursor" && results.docs.length < results.numFound ?
       <PreloadComponent {...this.props} /> : null;
+    const highlights = results.highlighting ? results.highlighting : {};
 
     return (
       <div className={cx("solr-faceted-search", {"container": bootstrapCss, "col-md-12": bootstrapCss})}>
@@ -79,6 +80,7 @@ class SolrFacetedSearch extends React.Component {
                                resultIndex={i}
                                rows={rows}
                                start={start}
+                               highlight={doc.id ? highlights[doc.id] : {}}
               />
             ))}
             {preloadListItem}
