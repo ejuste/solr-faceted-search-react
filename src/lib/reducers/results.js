@@ -6,8 +6,7 @@ const initialState = {
   highlighting: []
 };
 
-
-const tryGroupedResultCount = (data) => {
+const tryGroupedResultCount = data => {
   if (data.grouped) {
     for (let key in data.grouped) {
       if (data.grouped[key].matches) {
@@ -18,14 +17,16 @@ const tryGroupedResultCount = (data) => {
   return 0;
 };
 
-export default function (state = initialState, action) {
+export default function(state = initialState, action) {
   switch (action.type) {
     case "SET_RESULTS":
       return {
         ...state,
         docs: action.data.response ? action.data.response.docs : [],
         grouped: action.data.grouped || {},
-        numFound: action.data.response ? action.data.response.numFound : tryGroupedResultCount(action.data),
+        numFound: action.data.response
+          ? action.data.response.numFound
+          : tryGroupedResultCount(action.data),
         facets: action.data.facet_counts.facet_fields,
         highlighting: action.data.highlighting ? action.data.highlighting : [],
         pending: false
@@ -38,9 +39,16 @@ export default function (state = initialState, action) {
         pending: false
       };
 
+    case "SET_PENDING_FALSE":
+      return {
+        ...state,
+        pending: false
+      };
+
     case "SET_RESULTS_PENDING":
       return {
-        ...state, pending: true
+        ...state,
+        pending: true
       };
   }
 
