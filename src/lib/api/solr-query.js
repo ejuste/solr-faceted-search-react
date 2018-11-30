@@ -31,11 +31,12 @@ const listFacetFieldToQueryFilter = (field) => {
 };
 
 const textFieldToQueryFilter = (field) => {
-  if (!field.value || field.value.length === 0) {
+  const value = field.value || field.defaultValue;
+  if (!value || value.length === 0) {
     return null;
   }
 
-  return encodeURIComponent(field.field === "*" ? field.value : `${field.field}:${field.value}`);
+  return encodeURIComponent(field.field === "*" ? value : `${field.field}:${value}`);
 };
 
 const fieldToQueryFilter = (field) => {
