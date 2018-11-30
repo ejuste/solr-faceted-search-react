@@ -106,26 +106,36 @@ const buildMainQuery = (fields, mainQueryField) => {
   return qs;
 };
 
-const buildHighlight = (highlight) => {
+const buildHighlightParams = (highlight) => {
+  let hlParams = "hl=on";
+
+  for (const key of Object.keys(highlight)) {
+    // Support nested objects like hl.simple.tags
+    if (typeof highlight[key] === "object") {
+      for (const nestedKey of Object.keys(highlight[key])) {
+        hlParams += `&hl.${key}.${nestedKey}=${encodeURIComponent(highlight[key][nestedKey])}`;
+      }
+    }
+    // Support flat key/values like hl.fl=my_field_name
+    else {
+      hlParams += `&hl.${key}=${encodeURIComponent(highlight[key])}`;
+    }
+  }
+
+  return hlParams;
+}
+
+const buildHighlight = (highlight, context) => {
   let hlQs = "";
   // If highlight is set, then populate params from keys/values.
   if (highlight !== null && typeof highlight === "object") {
-    let hlParams = "hl=on";
-
-    for (const key of Object.keys(highlight)) {
-      // Support nested objects like hl.simple.tags
-      if (typeof highlight[key] === "object") {
-        for (const nestedKey of Object.keys(highlight[key])) {
-          hlParams += `&hl.${key}.${nestedKey}=${encodeURIComponent(highlight[key][nestedKey])}`;
-        }
-      }
-      // Support flat key/values like hl.fl=my_field_name
-      else {
-        hlParams += `&hl.${key}=${encodeURIComponent(highlight[key])}`;
-      }
+    hlQs = buildHighlightParams(highlight);
+  }
+  else if (highlight !== null && typeof highlight === "function") {
+    const highlightObject = highlight(context);
+    if (highlightObject) {
+      hlQs = buildHighlightParams(highlightObject);
     }
-
-    hlQs = hlParams;
   }
   return hlQs;
 };
@@ -161,7 +171,7 @@ const solrQuery = (query, format = {wt: "json"}) => {
 
   const sortParam = buildSort(sortFields.concat(idSort));
   const groupParam = group && group.field ? `group=on&group.field=${encodeURIComponent(group.field)}` : "";
-  const highlightParam = buildHighlight(hl);
+  const highlightParam = buildHighlight(hl, { fields: searchFields.concat(filters), mainQueryField });
 
   return mainQuery +
     `${queryParams.length > 0 ? `&${queryParams}` : ""}` +
