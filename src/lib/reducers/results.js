@@ -28,7 +28,7 @@ export default function(state = initialState, action) {
           ? action.data.response.numFound
           : tryGroupedResultCount(action.data),
         facets: action.data.facet_counts.facet_fields,
-        highlighting: action.data.highlighting ? action.data.highlighting : [],
+        highlighting: action.data.highlighting || {},
         pending: false
       };
 
@@ -36,6 +36,7 @@ export default function(state = initialState, action) {
       return {
         ...state,
         docs: state.docs.concat(action.data.response.docs),
+        highlighting: Object.assign({}, state.highlighting, action.data.highlighting),
         pending: false
       };
 
