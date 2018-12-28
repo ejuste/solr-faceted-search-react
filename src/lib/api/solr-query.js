@@ -36,7 +36,7 @@ const textFieldToQueryFilter = (field) => {
     return null;
   }
 
-  return encodeURIComponent(field.field === "*" ? value : `${field.field}:${value}`);
+  return encodeURIComponent(field.field === "*" ? value : `${field.field}:(${value})`);
 };
 
 const fieldToQueryFilter = (field) => {
